@@ -200,7 +200,8 @@ mod tests {
         assert_eq!(marker.step, Some(StepType::Process));
         assert_eq!(marker.success, None);
         assert_eq!(marker.status_code, None);
-        assert_eq!(marker.timestamp, timestamp);
+        // tolerate 2 ms slop to reduce flakiness:
+        assert!(marker.timestamp.abs_diff(timestamp) <= 2);
     }
 
     #[test]

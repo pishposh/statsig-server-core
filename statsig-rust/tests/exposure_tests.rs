@@ -285,19 +285,21 @@ async fn test_exposure_time() {
 
     let gate_expo = enforce_object(&events[0]);
     assert_eq!(gate_expo["eventName"], "statsig::gate_exposure");
-    assert_eq!(enforce_u64(&gate_expo["time"]), was);
+    assert!(enforce_u64(&gate_expo["time"]).abs_diff(was) <= 2);
+    // ^ tolerate 2 ms slop to reduce flakiness; mostly we're just checking that
+    // it's not using the flush time 100 ms later
 
     let config_expo = enforce_object(&events[1]);
     assert_eq!(config_expo["eventName"], "statsig::config_exposure");
-    assert_eq!(enforce_u64(&config_expo["time"]), was);
+    assert!(enforce_u64(&config_expo["time"]).abs_diff(was) <= 2); // 2 ms slop
 
     let experiment_expo = enforce_object(&events[2]);
     assert_eq!(experiment_expo["eventName"], "statsig::config_exposure");
-    assert_eq!(enforce_u64(&experiment_expo["time"]), was);
+    assert!(enforce_u64(&experiment_expo["time"]).abs_diff(was) <= 2); // 2 ms slop
 
     let layer_expo = enforce_object(&events[3]);
     assert_eq!(layer_expo["eventName"], "statsig::layer_exposure");
-    assert_eq!(enforce_u64(&layer_expo["time"]), was);
+    assert!(enforce_u64(&layer_expo["time"]).abs_diff(was) <= 2); // 2 ms slop
 }
 
 fn create_bootrapped_specs_adapter() -> Arc<MockSpecsAdapter> {

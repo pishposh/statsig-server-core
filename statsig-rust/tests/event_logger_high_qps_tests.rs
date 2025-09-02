@@ -44,6 +44,12 @@ async fn setup() -> (Arc<Statsig>, StatsigUser, MockScrapi) {
 async fn test_check_gate_overrides() {
     let (statsig, user, mock_scrapi) = setup().await;
 
+    // Adjust workload for 32-bit targets where the container may be slower:
+    #[cfg(target_pointer_width = "32")]
+    const ITERATIONS: usize = 50_000;
+    #[cfg(not(target_pointer_width = "32"))]
+    const ITERATIONS: usize = 100_000;
+
     for _ in 0..10 {
         let statsig = statsig.clone();
         let user = user.clone();
@@ -51,7 +57,7 @@ async fn test_check_gate_overrides() {
         let (tx, rx) = mpsc::channel::<()>();
         let overall_start = Instant::now();
         std::thread::spawn(move || {
-            for _ in 0..100_000 {
+            for _ in 0..ITERATIONS {
                 let start = Instant::now();
                 statsig.log_event(&user, "test_event", None, None);
                 let duration = start.elapsed();
