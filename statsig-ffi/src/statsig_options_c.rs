@@ -9,8 +9,11 @@ use crate::{
 };
 use statsig_rust::{
     data_store_interface::DataStoreTrait, log_e, output_logger::LogLevel, DynamicValue,
-    EventLoggingAdapter, InstanceRegistry, ObservabilityClient, SpecsAdapter,
-    StatsigLocalFileEventLoggingAdapter, StatsigLocalFileSpecsAdapter, StatsigOptions,
+    EventLoggingAdapter, InstanceRegistry, ObservabilityClient, SpecsAdapter, StatsigOptions,
+};
+#[cfg(not(target_family = "wasm"))]
+use statsig_rust::{
+    StatsigLocalFileEventLoggingAdapter, StatsigLocalFileSpecsAdapter,
 };
 use std::collections::HashMap;
 use std::sync::Weak;
@@ -105,6 +108,7 @@ pub extern "C" fn statsig_options_release(options_ref: u64) {
 fn try_get_specs_adapter(specs_adapter_ref: u64) -> Option<Arc<dyn SpecsAdapter>> {
     let raw = InstanceRegistry::get_raw(&specs_adapter_ref)?;
 
+    #[cfg(not(target_family = "wasm"))]
     if let Ok(adapter) = raw.clone().downcast::<StatsigLocalFileSpecsAdapter>() {
         return Some(adapter);
     }
@@ -121,6 +125,7 @@ fn try_get_event_logging_adapter(
 ) -> Option<Arc<dyn EventLoggingAdapter>> {
     let raw = InstanceRegistry::get_raw(&event_logging_adapter_ref)?;
 
+    #[cfg(not(target_family = "wasm"))]
     if let Ok(adapter) = raw
         .clone()
         .downcast::<StatsigLocalFileEventLoggingAdapter>()
