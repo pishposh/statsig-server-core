@@ -31,6 +31,7 @@ type StatsigOptions struct {
 	DisableNetwork              *bool
 	GlobalCustomFields          *string
 	ObservabilityClientRef      uint64
+	EventLoggingAdapterRef      uint64
 	DataStoreRef                uint64
 	InitTimeoutMs               int32
 	FallbackToStatsigApi        *bool
@@ -53,7 +54,7 @@ func (o *StatsigOptionsBuilder) Build() *StatsigOptions {
 		ResolveDefault(o.statsigOptions.SpecsUrl),
 		ResolveDefault(o.statsigOptions.LogEventUrl),
 		C.uint64_t(0),
-		C.uint64_t(0),
+		C.uint64_t(o.statsigOptions.EventLoggingAdapterRef),
 		ResolveDefault(o.statsigOptions.Environment),
 		C.int(o.statsigOptions.EventLoggingFlushIntervalMs),
 		C.int(o.statsigOptions.EventLoggingMaxQueueSize),
@@ -203,5 +204,10 @@ func (o *StatsigOptionsBuilder) WithInitTimeoutMs(value int32) *StatsigOptionsBu
 
 func (o *StatsigOptionsBuilder) WithFallbackToStatsigApi(value bool) *StatsigOptionsBuilder {
 	o.statsigOptions.FallbackToStatsigApi = &value
+	return o
+}
+
+func (o *StatsigOptionsBuilder) WithEventLoggingAdapter(adapter EventLoggingAdapterInterface) *StatsigOptionsBuilder {
+	o.statsigOptions.EventLoggingAdapterRef = NewEventLoggingAdapter(adapter)
 	return o
 }
