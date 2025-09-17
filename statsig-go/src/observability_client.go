@@ -5,9 +5,9 @@ package statsig
 #include <stdlib.h>
 
 typedef void (*init_fn_t)(uint64_t);
-typedef void (*increment_fn_t)(uint64_t, char*, double, void*);
-typedef void (*gauge_fn_t)(uint64_t, char*, double, void*);
-typedef void (*dist_fn_t)(uint64_t, char*, double, void*);
+typedef void (*increment_fn_t)(uint64_t, char*, double, char*);
+typedef void (*gauge_fn_t)(uint64_t, char*, double, char*);
+typedef void (*dist_fn_t)(uint64_t, char*, double, char*);
 typedef void (*error_fn_t)(uint64_t, char*, char*);
 typedef bool (*should_enable_high_cardinality_for_this_tag_fn_t)(uint64_t, char*);
 

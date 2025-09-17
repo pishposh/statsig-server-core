@@ -7,13 +7,13 @@ package statsig
 typedef void (*initialize_fn_t)(uint64_t);
 typedef void (*shutdown_fn_t)(uint64_t);
 typedef char* (*get_fn_t)(uint64_t, char*);
-typedef void (*set_fn_t)(uint64_t, char*, char*, uint64_t);
+typedef void (*set_fn_t)(uint64_t, char*, char*, uint64_t*);
 typedef bool (*support_polling_fn_t)(uint64_t, char*);
 
 void go_data_store_initialize(uint64_t dataStoreID);
 void go_data_store_shutdown(uint64_t dataStoreID);
 char* go_data_store_get(uint64_t dataStoreID, char* key);
-void go_data_store_set(uint64_t dataStoreID, char* key, char* value, uint64_t time);
+void go_data_store_set(uint64_t dataStoreID, char* key, char* value, uint64_t* time);
 bool go_data_store_support_polling_updates_for(uint64_t dataStoreID, char* key);
 */
 import "C"
@@ -70,7 +70,7 @@ func go_data_store_get(dataStoreID C.uint64_t, key *C.char) *C.char {
 }
 
 //export go_data_store_set
-func go_data_store_set(dataStoreID C.uint64_t, key *C.char, value *C.char, time C.uint64_t) {
+func go_data_store_set(dataStoreID C.uint64_t, key *C.char, value *C.char, time *C.uint64_t) {
 	registryMutexDataStore.RLock()
 	defer registryMutexDataStore.RUnlock()
 
