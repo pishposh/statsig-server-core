@@ -141,6 +141,7 @@ func (s *Statsig) InitializeWithDetails() (InitializeWithDetails, error) {
 
 	if res != nil {
 		res_str := C.GoString(res)
+		C.free_string(res)
 		err := json.Unmarshal([]byte(res_str), &details)
 		if err != nil {
 			return InitializeWithDetails{}, err
@@ -318,6 +319,7 @@ func (s *Statsig) GetClientInitializeResponse(user StatsigUser, gcirOptions *Cli
 	}
 
 	res := C.statsig_get_client_init_response(C.uint64_t(s.InnerRef), C.uint64_t(user.innerRef), C.CString(utils.ConvertJSONToString(gcirOptions)))
+	defer C.free_string(res)
 	return C.GoString(res)
 }
 
