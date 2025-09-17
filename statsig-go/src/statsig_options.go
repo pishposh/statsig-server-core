@@ -7,6 +7,7 @@ package statsig
 import "C"
 import (
 	"runtime"
+	"unsafe"
 
 	"github.com/statsig-io/statsig-server-core/statsig-go/src/utils"
 )
@@ -35,6 +36,7 @@ type StatsigOptions struct {
 	DataStoreRef                uint64
 	InitTimeoutMs               int32
 	FallbackToStatsigApi        *bool
+	SpecsAdapterRef             uint64
 }
 
 type StatsigOptionsBuilder struct {
@@ -53,7 +55,7 @@ func (o *StatsigOptionsBuilder) Build() *StatsigOptions {
 	optionsRef := C.statsig_options_create(
 		ResolveDefault(o.statsigOptions.SpecsUrl),
 		ResolveDefault(o.statsigOptions.LogEventUrl),
-		C.uint64_t(0),
+		C.uint64_t(o.statsigOptions.SpecsAdapterRef),
 		C.uint64_t(o.statsigOptions.EventLoggingAdapterRef),
 		ResolveDefault(o.statsigOptions.Environment),
 		C.int(o.statsigOptions.EventLoggingFlushIntervalMs),
@@ -209,5 +211,17 @@ func (o *StatsigOptionsBuilder) WithFallbackToStatsigApi(value bool) *StatsigOpt
 
 func (o *StatsigOptionsBuilder) WithEventLoggingAdapter(adapter EventLoggingAdapterInterface) *StatsigOptionsBuilder {
 	o.statsigOptions.EventLoggingAdapterRef = NewEventLoggingAdapter(adapter)
+	return o
+}
+
+// WithBootstrapSpecs wires a Rust bootstrap specs adapter and sets it on options.
+// It accepts the raw JSON bytes and passes (ptr,len) via FFI to avoid cgo envelope overhead.
+func (o *StatsigOptionsBuilder) WithBootstrapSpecs(specs []byte) *StatsigOptionsBuilder {
+	if len(specs) == 0 {
+		return o
+	}
+	adapter := C.statsig_bootstrap_specs_adapter_create_from_bytes((*C.char)(unsafe.Pointer(&specs[0])), C.uintptr_t(len(specs)))
+	runtime.KeepAlive(specs)
+	o.statsigOptions.SpecsAdapterRef = uint64(adapter)
 	return o
 }

@@ -11,6 +11,7 @@ use statsig_rust::{
     data_store_interface::DataStoreTrait, log_e, output_logger::LogLevel, DynamicValue,
     EventLoggingAdapter, InstanceRegistry, ObservabilityClient, SpecsAdapter, StatsigOptions,
 };
+use statsig_rust::StatsigBootstrapSpecsAdapter;
 #[cfg(not(target_family = "wasm"))]
 use statsig_rust::{
     StatsigLocalFileEventLoggingAdapter, StatsigLocalFileSpecsAdapter,
@@ -114,6 +115,10 @@ fn try_get_specs_adapter(specs_adapter_ref: u64) -> Option<Arc<dyn SpecsAdapter>
     }
 
     if let Ok(adapter) = raw.clone().downcast::<FunctionBasedSpecsAdapterC>() {
+        return Some(adapter);
+    }
+
+    if let Ok(adapter) = raw.clone().downcast::<StatsigBootstrapSpecsAdapter>() {
         return Some(adapter);
     }
 

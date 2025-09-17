@@ -255,6 +255,11 @@ void statsig_http_specs_adapter_release(uint64_t specs_adapter_ref);
 char *statsig_http_specs_adapter_fetch_specs_from_network(uint64_t specs_adapter_ref,
                                                           const char *current_specs_info);
 
+uint64_t statsig_bootstrap_specs_adapter_create_from_bytes(const char *data_ptr,
+                                                           uintptr_t data_len);
+
+void statsig_bootstrap_specs_adapter_release(uint64_t specs_adapter_ref);
+
 uint64_t statsig_local_file_event_logging_adapter_create(const char *sdk_key,
                                                          const char *output_directory,
                                                          const char *log_event_url,
