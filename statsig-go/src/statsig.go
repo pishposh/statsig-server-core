@@ -69,12 +69,36 @@ func RemoveSharedInstance() {
 	fmt.Println("[Statsig] Shared instance successfully removed")
 }
 
+type SpecsSource struct {
+	Name    string // "Network", "Loading", etc.
+	Adapter string // e.g. "DataStore", only set when Name is "Adapter"
+}
+
+func (s *SpecsSource) UnmarshalJSON(b []byte) error {
+	// case 1: string value, e.g. "Network", "Loading":
+	var asStr string
+	if err := json.Unmarshal(b, &asStr); err == nil {
+		s.Name, s.Adapter = asStr, ""
+		return nil
+	}
+	// case 2: {"Adapter": "..."}
+	var m map[string]string
+	if err := json.Unmarshal(b, &m); err != nil {
+		return err
+	}
+	if v, ok := m["Adapter"]; ok && len(m) == 1 {
+		s.Name, s.Adapter = "Adapter", v
+		return nil
+	}
+	return fmt.Errorf("invalid SpecsSource: %s", string(b))
+}
+
 type InitializeWithDetails struct {
 	Duration          float64         `json:"duration"`
 	InitSuccess       bool            `json:"init_success"`
 	IsConfigSpecReady bool            `json:"is_config_spec_ready"`
 	IsIdListReady     *bool           `json:"is_id_list_ready"`
-	Source            string          `json:"source"`
+	Source            SpecsSource     `json:"source"`
 	FailureDetails    *FailureDetails `json:"failure_details"`
 }
 
