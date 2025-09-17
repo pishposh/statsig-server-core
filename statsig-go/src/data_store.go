@@ -82,16 +82,16 @@ func go_data_store_set(dataStoreID C.uint64_t, key *C.char, value *C.char, time 
 }
 
 //export go_data_store_support_polling_updates_for
-func go_data_store_support_polling_updates_for(dataStoreID C.uint64_t, key *C.char) C.bool {
+func go_data_store_support_polling_updates_for(dataStoreID C.uint64_t, key *C.char) C._Bool {
 	registryMutexDataStore.RLock()
 	defer registryMutexDataStore.RUnlock()
 
 	if dataStore, exists := dataStoreRegistry[uint64(dataStoreID)]; exists {
 		goKey := C.GoString(key)
 		result := dataStore.ShouldBeUsedForQueryingUpdates(goKey)
-		return C.bool(result)
+		return C._Bool(result)
 	}
-	return C.bool(false)
+	return C._Bool(false)
 }
 
 func NewDataStore(dataStore DataStoreInterface) uint64 {

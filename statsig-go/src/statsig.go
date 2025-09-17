@@ -392,7 +392,7 @@ func (s *Statsig) GetInterfaceFromParameterStore(user StatsigUser, paramStoreNam
 }
 
 func (s *Statsig) OverrideGate(gateName string, gateValue bool, id string) {
-	C.statsig_override_gate(C.uint64_t(s.InnerRef), C.CString(gateName), C.bool(gateValue), C.CString(id))
+	C.statsig_override_gate(C.uint64_t(s.InnerRef), C.CString(gateName), C._Bool(gateValue), C.CString(id))
 }
 
 func (s *Statsig) OverrideLayer(layerName string, layerValue map[string]interface{}, id string) {

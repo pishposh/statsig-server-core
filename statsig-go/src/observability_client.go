@@ -158,15 +158,15 @@ func go_observability_client_error(obClientID C.uint64_t, tag *C.char, error *C.
 }
 
 //export go_observability_client_should_enable_high_cardinality_for_this_tag_fn
-func go_observability_client_should_enable_high_cardinality_for_this_tag_fn(obClientID C.uint64_t, tag *C.char) C.bool {
+func go_observability_client_should_enable_high_cardinality_for_this_tag_fn(obClientID C.uint64_t, tag *C.char) C._Bool {
 	registryMutexObClient.RLock()
 	defer registryMutexObClient.RUnlock()
 
 	if obsClient, exists := observabilityClientRegistry[uint64(obClientID)]; exists {
-		return C.bool(obsClient.ShouldEnableHighCardinalityForThisTag(C.GoString(tag)))
+		return C._Bool(obsClient.ShouldEnableHighCardinalityForThisTag(C.GoString(tag)))
 	}
 
-	return C.bool(false)
+	return C._Bool(false)
 }
 
 func NewObservabilityClient(observabilityClient ObservabilityClientInterface) uint64 {
