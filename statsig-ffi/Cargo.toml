@@ -23,6 +23,10 @@ jni = "0.21.1"
 csbindgen = "1.9.2"
 cbindgen = "0.26.0"
 
+# avoid reqwest on wasm:
+[target.'cfg(target_family = "wasm")'.dependencies]
+statsig-rust = { path = "../statsig-rust", default-features = false, features = ["custom_network_provider"] }
+
 [lib]
 crate-type = ["cdylib"]
 
